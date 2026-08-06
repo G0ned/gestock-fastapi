@@ -1,0 +1,4 @@
+gestock_env
+docker
+/app/__pycache__
+/app/.git
