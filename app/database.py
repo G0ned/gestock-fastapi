@@ -1,8 +1,18 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import os
+
 #<conexion>://<username>:<password>@<host>:<port>/<database>
-db_url = f"{os.getenv("DB_CONNECTION")}{os.getenv("DB_USERNAME")}:{os.getenv("DB_PASSWORD")}@{os.getenv("DB_HOST")}:{os.getenv("DB_PORT")}/{os.getenv("DB_DATABASE")}"
+
+connection = os.getenv("DB_CONNECTION")
+username = os.getenv("DB_USERNAME")
+password = os.getenv("DB_PASSWORD")
+host = os.getenv("DB_HOST")
+port = os.getenv("DB_PORT")
+database = os.getenv("DB_DATABASE")
+
+db_url = f"{connection}{username}:{password}@{host}:{port}/{database}"
+
 engine = create_engine(db_url)
 session = sessionmaker(autocommit=False, bind=engine)
 

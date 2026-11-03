@@ -1,64 +1,43 @@
-import { useState, useEffect } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
-import './App.css'
-import ProductForm from './ProductForm'
+import { useProducts } from '../src/hooks/useProducts'
+import ProductForm from '../src/components/ProductForm'
 
-function App() {
-  const [products, setProducts] = useState([])
-  const [form, setForm] = useState({name: '', description:'', price: '', quantity: ''})
+export default function App(){
+  const {products, loading, error, addProduct} = useProducts()
+  return(
+    <div className='mx-auto max-w-3xl p-6'>
+      <h1 className='mb-4 text-2xl font-bold'>
+        gestock
+      </h1>
 
-  function handleChange(e){
-    const value = e.target.type === 'number' ? e.target.valueAsNumber : e.target.value
-    setForm({...form, [e.target.name]: value})
-  }
+      <ProductForm onSubmit={addProduct}/>
 
-  function handleSubmit(e){
-    e.preventDefault()
-    fetch('http://localhost:8000/product', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify(form)
-    })
-    .then(response => response.json())
-    .then(newProduct=>{
-      setProducts([...products, newProduct])
-      setForm({name: '', description: '', price:'', quantity:''})
-    })
-  }
-
-  useEffect(()=> {
-    fetch('http://localhost:8000/products')
-    .then(response => response.json())
-    .then(data => setProducts(data))
-  }, [])
-
-  return (
-    <>
-    <ProductForm form={form} onChange={handleChange} onSubmit={handleSubmit}></ProductForm>
-    <table>
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>Name</th>
-          <th>Description</th>
-          <th>Price</th>
-          <th>Quantity</th>
-        </tr>
-      </thead>
-      {products.map(product=>(
-        <tr key={product.id}>
-          <td>{product.id}</td>
-          <td>{product.name}</td>
-          <td>{product.description}</td>
-          <td>{product.price}</td>
-          <td>{product.quantity}</td>
-        </tr>
-      ))}
-    </table>
-  </>
-  ) 
+      {loading && <p>Loading…</p>}
+      {error && <p className="text-red-600">Error: {error}</p>}
+      
+      {!loading && !error && (
+        <table className="w-full border-collapse text-left">
+          <thead>
+            <tr className="border-b">
+              <th className="py-2">ID</th>
+              <th className="py-2">Name</th>
+              <th className="py-2">Description</th>
+              <th className="py-2">Price</th>
+              <th className="py-2">Qty</th>
+            </tr>
+          </thead>
+          <tbody>
+            {products.map((product) => (
+              <tr key={product.id} className="border-b">
+                <td className="py-2">{product.id}</td>
+                <td className="py-2">{product.name}</td>
+                <td className="py-2">{product.description}</td>
+                <td className="py-2">{product.price}</td>
+                <td className="py-2">{product.quantity}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  )
 }
-
-export default App
