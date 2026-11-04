@@ -74,7 +74,7 @@ def update_product(id: int, product: ProductCreate, db: Session = Depends(get_db
 def delete_product(id: int, db: Session = Depends(get_db)):
     deleting_product = db.query(ProductModel).filter(ProductModel.id == id).first()
     if deleting_product is None:
-        raise HTTPException(status_code=404, detail="The product could not be deleted")
+        raise HTTPException(status_code=404, detail="Product not found")
     db.delete(deleting_product)
     db.commit()
 
