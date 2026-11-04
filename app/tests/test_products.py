@@ -1,3 +1,7 @@
+ERR_NOT_FOUND_PRODUCT = "Product not found"
+ERR_NOT_FOUND_MANUFACTURER = "Manufacturer not found"
+
+
 def test_list_products_empty(client):
     # Test para comprobar que una llamada cuando no hay datos en la bd funciona y devuelve json vacío
     response = client.get("/products")
@@ -122,7 +126,7 @@ def test_creating_product_with_invalid_manufacturer_id(client):
 
     response = client.post("/products", json=data)
     assert response.status_code == 404
-    assert response.json()["detail"] == "Manufacturer not found"
+    assert response.json()["detail"] == ERR_NOT_FOUND_MANUFACTURER
     assert client.get("/products").json() == []
 
 
@@ -149,7 +153,7 @@ def test_updating_non_existent_product(client, manufacturer):
     product_id = 999
     response = client.put(f"/products/{product_id}", json=product)
     assert response.status_code == 404
-    assert response.json()["detail"] == "Product not found"
+    assert response.json()["detail"] == ERR_NOT_FOUND_PRODUCT
     assert client.get("/products").json() == []
 
 
@@ -175,6 +179,55 @@ def test_updating_product_with_non_existent_manufacturer_id(client, products):
     response = client.put(f"/products/{product_id}", json=product)
     updated_product = client.get(f"/products/{product_id}").json()
     assert response.status_code == 404
-    assert response.json()["detail"] == "Manufacturer not found"
+    assert response.json()["detail"] == ERR_NOT_FOUND_MANUFACTURER
     assert updated_product["manufacturer_id"] == manufacturer_id_before
 
+
+def test_delete_product(client, products):
+    # Captación del ID de uno de los productos de prueba creados en conftest.py
+    product_id = products[0]["id"]
+    # Simulación de petición delete al endpoint correspondiente con el ID del producto guardado anteriormente
+    response = client.delete(f"/products/{product_id}")
+    # Comprobación de que el proceso de delete se produjo sin problemas y que el código de estado es 204
+    assert response.status_code == 204
+    # Comprobación de que el content de la respuesta está vacío ya que un delete
+    # carece de contenido en el cuerpo de la respuesta
+    assert response.content == b""
+    # Simulación de una petición get del producto recién borrado usando el mismo id de producto
+    get_del_product = client.get(f"/products/{product_id}")
+    # Comprobación de que se devuelve un error 404 de que el producto no se pudo encontrar
+    assert get_del_product.status_code == 404
+    # Confirmación de que el error 404 es debido a que el producto no se pudo encontrar
+    assert get_del_product.json()["detail"] == ERR_NOT_FOUND_PRODUCT
+    # Ultima validación, que la eliminación de un producto no elimina los otros existentes
+    assert len(client.get("/products/").json()) > 0
+
+
+def test_delete_non_existent_product(client):
+    # Invención de un ID de producto que no existe
+    product_id = 999
+    # Simulación de petición delete con ID que no existe
+    response = client.delete(f"/products/{product_id}")
+    # Comprobación de que devuelve un error 404 al no existir un producto con dicho ID
+    assert response.status_code == 404
+    # Confirmación de que la generación del error 404 es por la
+    # petición debido a que no existe un producto con el ID indicado
+    assert response.json()["detail"] == ERR_NOT_FOUND_PRODUCT
+
+
+def test_delete_same_product_twice(client, products):
+    # Captación del ID de uno de los productos de prueba creados en conftest.py
+    product_id = products[1]["id"]
+    # Simulación de petición delete
+    response = client.delete(f"/products/{product_id}")
+    # Comprobación de que el código de la respuesta es 204
+    assert response.status_code == 204
+    # Comprobación de que el content de la respuesta está vacío ya que un delete
+    # carece de contenido en el cuerpo de la respuesta
+    assert response.content == b""
+    # Simulación de un intento de borrado del mismo producto
+    second_del = client.delete(f"/products/{product_id}")
+    # Comprobación de que el código de la respuesta es 404
+    # y que se debe a que el producto no se ha encontrado
+    assert second_del.status_code == 404
+    assert second_del.json()["detail"] == ERR_NOT_FOUND_PRODUCT
