@@ -50,7 +50,10 @@ services:
     container_name: react
     restart: unless-stopped
     ports:
-      - "${REACT_PORT}:5173"
+      - "${REACT_PORT}:3000"
+    environment:
+      # Necesario en Windows para que CRA detecte los cambios y recargue (hot reload)
+      - WATCHPACK_POLLING=true
     volumes:
       - ./frontend:/frontend
       - node_modules:/frontend/node_modules
