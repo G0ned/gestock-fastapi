@@ -122,6 +122,7 @@ def test_creating_product_with_invalid_manufacturer_id(client):
 
     response = client.post("/products", json=data)
     assert response.status_code == 404
+    assert response.json()["detail"] == "Manufacturer not found"
     assert client.get("/products").json() == []
 
 
@@ -131,34 +132,49 @@ def test_updating_a_product(client, products):
     product["quantity"] = 0
     response = client.put(f"/products/{product_id}", json=product)
     assert response.status_code == 200
-    assert client.get(f"/products/{product_id}").json()["quantity"] == 0
+    updated_product = client.get(f"/products/{product_id}").json()
+    assert updated_product["quantity"] == 0
+    assert updated_product["name"] == product["name"]
+    assert updated_product["price"] == product["price"]
 
 
 def test_updating_non_existent_product(client, manufacturer):
     product = {
-        "id": 999,
         "name": "Headset",
         "description": "Headset with incorporated microphone and high-quality audio",
         "price": 79.99,
         "quantity": 10,
         "manufacturer_id": manufacturer["id"],
     }
-    product_id = product["id"]
+    product_id = 999
     response = client.put(f"/products/{product_id}", json=product)
     assert response.status_code == 404
+    assert response.json()["detail"] == "Product not found"
+    assert client.get("/products").json() == []
 
 
 def test_updating_product_with_invalid_data(client, products):
     product = products[1]
     product_id = product["id"]
+    price_before_up = product["price"]
     product["price"] = -20
     response = client.put(f"/products/{product_id}", json=product)
+    error = response.json()["detail"][0]
+    updated_product = client.get(f"/products/{product_id}").json()
     assert response.status_code == 422
+    assert error["loc"] == ["body", "price"]
+    assert error["type"] == "greater_than"
+    assert updated_product["price"] == price_before_up
 
 
 def test_updating_product_with_non_existent_manufacturer_id(client, products):
     product = products[0]
+    manufacturer_id_before = product["manufacturer_id"]
     product_id = product["id"]
     product["manufacturer_id"] = 999
     response = client.put(f"/products/{product_id}", json=product)
+    updated_product = client.get(f"/products/{product_id}").json()
     assert response.status_code == 404
+    assert response.json()["detail"] == "Manufacturer not found"
+    assert updated_product["manufacturer_id"] == manufacturer_id_before
+
