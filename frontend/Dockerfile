@@ -9,6 +9,7 @@ RUN npm install
 
 COPY ./frontend /frontend/
 
-EXPOSE 5173 
+# Create React App sirve en el puerto 3000 con "npm start"
+EXPOSE 3000
 
-CMD ["npm", "run", "dev", "--", "--host"]
+CMD ["npm", "start"]

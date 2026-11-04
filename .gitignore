@@ -1,4 +1,13 @@
 .env
+gestock_env/
+.venv/
 **/__pycache__/
 frontend/node_modules
 frontend/dist
+# Entornos virtuales de Python
+gestock_env/
+.venv/
+
+# Build de Create React App
+frontend/build
+frontend/.env

@@ -1,0 +1,22 @@
+{
+	"folders": [
+		{
+			"path": "."
+		}
+	],
+	"settings": {
+		//Configuración de propiedades del espacio de trabajo (workspace)
+		"python.analysis.extraPaths": ["./app"],
+		//Activar el formateo del código al guardar
+		"editor.formatOnSave": true,
+		//Definición del formateador por defecto --> Prettier
+		"editor.defaultFormatter": "esbenp.prettier-vscode",
+		"[python]": {
+			//Para Python, definición del formateador Ruff (Prettier no es compatible con el lenguaje Python)
+			"editor.defaultFormatter": "charliermarsh.ruff",
+			"editor.codeActionsOnSave": {
+				"source.organizeImports": "explicit"
+			}
+		}
+	}
+}

@@ -1,4 +1,5 @@
-const BASE_URL = import.meta.env.VITE_API_URL
+//Creación de una constante que toma el valor de la variable de entorno REACT_APP_API_URL que es la URL de la API
+const BASE_URL = process.env.REACT_APP_API_URL
 
 export async function request(path, options = {}) {
     const response = await fetch(`${BASE_URL}${path}`,{
