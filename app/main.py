@@ -104,7 +104,7 @@ def get_manufacturer(manufacturer_id: int, db: DbSession):
         .first()
     )
     if manufacturer is None:
-        raise HTTPException(status_code=404, detail="Manufacturer could not be found")
+        raise HTTPException(status_code=404, detail=ERR_NOT_FOUND_MANUFACTURER)
     else:
         return manufacturer
 

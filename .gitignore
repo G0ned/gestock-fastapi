@@ -11,3 +11,4 @@ gestock_env/
 # Build de Create React App
 frontend/build
 frontend/.env
+frontend/docs
