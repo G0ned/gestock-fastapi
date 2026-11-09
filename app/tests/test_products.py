@@ -20,12 +20,17 @@ def test_list_products(client, products):
 
 def test_get_product(client, products):
     product_id = products[0]["id"]
-    print(product_id)
     response = client.get(f"/products/{product_id}")
     assert response.status_code == 200
     response_data = response.json()
     assert response_data["name"] == "Keyboard"
 
+def test_get_non_existent_product(client):
+    product_id = 999
+    response = client.get(f"/products/{product_id}")
+    response_data = response.json()
+    assert response.status_code == 404
+    assert response_data["detail"] == ERR_NOT_FOUND_PRODUCT
 
 def test_create_product(client, manufacturer):
     # Test para comprobar que la creación de un producto funciona correctamente
